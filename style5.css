@@ -1,0 +1,374 @@
+/*This centers all the elements on the page */
+#centerall {
+    width: 980px;
+    margin-left:auto;
+    margin-right:auto;
+    padding-right:100px;
+    margin-top: 50px;
+    
+}
+#centerpa {
+    width: 1080px;
+    margin-left:auto;
+    margin-right:auto;
+
+    
+}
+#tophalf{
+    padding-left: 50px;
+}
+#button1{
+    background-color: #555555;
+    color: white;
+    border-top: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    font-family: Times;
+    font-size: 15px;
+    margin-top: 20px;
+    margin-left: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 120px;
+    
+    
+}
+#button1:hover, #button2:hover{
+    background-color: #4EB858 !important;
+    color:white !important;
+    transition-duration: 0.5s !important;
+}
+
+#button2{
+    background-color: whitesmoke;
+    border-top: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    font-family: Times;
+    font-size: 15px;
+    margin-left: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 120px;
+}
+
+.buttonformat{
+    position:fixed;
+}
+
+.middle{
+    padding-top: 5px;
+    padding-left: 200px;
+
+}
+.right{
+    padding-top: 5px;
+    padding-left: 700px;
+}
+.titles{
+    padding-top: 30px;
+    font-size: 25px;
+}
+
+hr{
+    margin-top: 3px;
+    border-style:dashed solid;
+}
+
+.headlines{
+    position:relative;
+    margin-right: 10px;
+    display:block;
+}
+#headlines0{
+    position:relative;
+    margin-right: 10px;
+    display:block;
+}
+#headlines1{
+    position:relative;
+    margin-right: 10px;
+    display:block;
+}
+#headlines2{
+    position:relative;
+    margin-right: 10px;
+    display:block;
+}
+#headlines3{
+    position:relative;
+    margin-right: 10px;
+    display:block;
+}
+#headlines4{
+    position:relative;
+    margin-right: 10px;
+    display:block;
+}
+.linkoverlay{
+    text-align:center;
+    bottom: 2px;
+    position:absolute;
+    font-size: 20px;
+    color:white;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 100%;
+    height: auto;
+}
+.overlaytitles{
+    position: relative;
+    bottom: 25px;
+    margin-bottom: -30px;
+    
+}
+.overlaydetails{
+    text-align:center;
+   /* bottom: 2px;*/
+    position:relative;
+    font-size: 15px;
+    color:white;
+    text-decoration: none;
+    width: 100%;
+   /* height: 100%;*/
+}
+#bottomhalf{
+
+    border-collapse:separate;
+    border-spacing:10px 0px;
+    height: 500px;
+    width: 25%;
+}
+#cnncards{
+    color: black;
+    text-align:center;
+    width: 500px;
+}
+.cardtext{
+    position:relative;
+    bottom: 17px;
+    height: 259px;
+    overflow:hidden;
+    color:black;
+}
+.cardhref a{
+    text-decoration: none;
+}
+#allcards{
+    text-align:center;
+    margin-right: 10px;
+}
+.card11{
+    position:static;
+    display:inline-block;
+    width: 100px;
+    text-align: center;
+    margin-left: 8px;
+    border: 1px solid black;
+    border-radius: 10px;
+    height: 300px;
+    background-color: ghostwhite;
+}
+
+.card1{
+   
+/*use this to adjust the width of the table!*/
+    width: 200px;
+    height: 400px;
+    border: 1px solid RGB(173,173,173);
+    border-radius: 5px;
+    background-color: whitesmoke;
+
+}
+.cardimages{
+    border-radius:5px;
+    width: 200px;
+    height: 150px;
+    object-fit:cover;
+}
+
+.crop{
+    height: 250px;
+    width: 450px;
+    object-fit:cover;
+}
+/*styling for word cloud*/
+
+#my_dataviz{
+    background-color:#F5F5F5; 
+    width:300px; 
+    height : 250px; 
+    padding-top:5px;
+    margin-left: 20px;
+}
+/*This centers the form.  May need to rearange with padding*/
+#mainform{
+    background-color:RGB(243, 243, 243);
+    width:700px;
+    margin-left: auto;
+    margin-right:auto;
+    padding-top: 20px;
+    padding-left: 15px;
+}
+.formformating0{
+    /*float:left;*/
+    margin-left: px;
+     margin-right: 15px;
+    font-size: 15px;
+    width: 120px;
+    
+}
+.formformating1{
+    /*float:left;*/
+    display:inline-block;
+     margin-right: 15px;
+    font-size: 14.5px;
+}
+.requiredstar{
+    color:red;
+}
+#centerform{
+    margin-top: 20px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-bottom: 20px;
+    padding-right: 20px;
+    text-align: center;   
+}
+#centersubmit{
+    margin-top: 20px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-bottom: 20px;
+    padding-right: 20px;
+    padding-bottom: 15px;
+    text-align: center;   
+}
+.bottombut{
+    font-size: 13px;
+    margin-left: 20px;
+    background-color:rgb(238,238,238);
+    border-radius: 1px;
+    width: 60px;
+    height: 30px;
+    border: 1px solid rgb(238,238,238);
+    transition-duration: 0.5s !important;
+}
+.bottombut:hover, .bottombut:hover{
+    background-color: #4EB858 !important;
+    color:white !important;
+    transition-duration: 0.5s !important;
+}
+#category{
+    font-size: 13px;
+    width: 110px;
+    text-align-last:center;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+#source{
+    font-size: 13px;
+    width: 110px;
+    text-align-last:center;
+    margin-left: 10px;
+}
+.tofloat{
+    position:static;
+    float:left;
+}
+.cropcardpic{
+    padding-top: 20px;
+    padding-left: 25px;
+    padding-right: 25px;
+    height: 70px;
+    width: 70px;
+    object-fit:cover;
+}
+.imagecolumn{
+    height:120px;
+}
+.returncard{
+    display:none;
+    cursor: pointer;
+    float:left;
+    border-radius: 4px;
+    padding-right:10px;
+    border: 1.3px solid rgba(190, 188, 188);
+    background-color: whitesmoke;
+   /* display:inline-block;*/
+    /*to define space between the cards use this.  If the height is changed, need to change image column as well.*/
+    width: 700px;
+    height: 120px;
+    margin-bottom: 10px;
+    overflow:hidden;
+}
+.returncard:hover{
+    position:relative;
+    box-shadow: 0 25px 15px 0 rgba(0,0,0,0.3);
+}
+.compcardalltext{
+    margin-top: -10px;
+    width: 670px;
+}
+.compcardtext{
+    margin-top: -15px;
+    
+    margin-bottom: 20px;
+}
+.marksthespot{
+    cursor: pointer;
+    margin-left: 685px;
+    position:absolute;
+    display:none;
+}
+/*this defines the width fo the cards to align with the page.  May need to add some padding to properly align in the real thingy but fine for now*/
+#replace{
+    
+    width:700px;
+    margin-left: auto;
+    margin-right:auto;
+}
+#butmoreless{
+    display:none;
+    background-color:rgb(238,238,238);
+    border-radius: 1px;
+    font-size:12px;
+    width: 100px;
+    height: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid rgb(238,238,238);
+    
+}
+#butmoreless:hover{
+    background-color: #4EB858 !important;
+    color:white !important;
+    transition-duration: 0.5s !important;
+}
+.exttx{
+    margin-bottom: 30px;
+}
+#hideyourskeletons{
+    display:none;
+}
+#hidethistillclicked{
+    display:none;
+}
+#noresults{
+    display:none;
+    width: 700px;
+    margin-left:auto;
+    margin-right:auto;
+    padding-left:360px;
+}
+
+:focus{
+outline:0;
+}
+
+
+

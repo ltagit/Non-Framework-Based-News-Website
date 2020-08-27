@@ -1,0 +1,1031 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+   <link rel="stylesheet" type="text/css" href="/static/style5.css"> 
+<!--This Loads d3.js and d3 cloud-->
+<script src="https://d3js.org/d3.v4.js"></script> 
+<script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+    
+<script>
+var html_text=0;
+var tempi=1;
+var intervaltime;
+var storeforpic=[];
+var prv_html_text = "";
+var nxt_html_text = "";
+var nxt2_html_text= "";
+var plsstop = 0;
+var numberofarticles;
+var URL="/testing";
+function button1(){
+ defaultstuff();   
+ plsstop = 1;   
+document.getElementById("hidethistillclicked").style.display="none";   
+document.getElementById("maincontent").innerHTML=" <table id='tophalf'><tr><td id='insertslidingcards'></td><td colspan='2' id='my_dataviz'>    </td></tr></table><table id='bottomhalf'><th class = 'titles' colspan='4'>CNN<hr></th><tr id='cnncards'><td id='insertcnncard'></td></tr><th class = 'titles' colspan='4'>Fox News<hr></th><tr id='cnncards'><td id='insertfoxcard'></td></tr></table>";     
+document.getElementById("button1").style.backgroundColor="#555555";
+document.getElementById("button1").style.color="white";
+document.getElementById("button2").style.backgroundColor="whitesmoke";
+document.getElementById("button2").style.color="black";    
+topheadlinesjson();
+cnnheadlinesjson();
+foxheadlinesjson();
+wctopheadlinesjson(); 
+}        
+    
+function button2(){
+
+plsstop = 0;
+document.getElementById("button2").style.backgroundColor="#555555";
+document.getElementById("button2").style.color="white";
+document.getElementById("button1").style.backgroundColor="whitesmoke";
+document.getElementById("button1").style.color="black";     
+document.getElementById("noresults").style.display="none";       
+document.getElementById("maincontent").innerHTML="";
+defaultstuff();
+document.getElementById("butmoreless").style.display="none";
+document.getElementById("hidethistillclicked").style.display="block";      
+}
+
+function changecolor(){
+    document.getElementById("button2").style.backgroundColor="green";
+    document.getElementById("button1").style.backgroundColor="green";
+}
+var texttomod;
+function loadingJSON(URL, functoload){
+    var axmlhttp;
+    axmlhttp=new XMLHttpRequest();
+    axmlhttp.onreadystatechange = function()
+    {
+     if (this.readyState== 4 && this.status==200)
+            {
+              var loadjsonObj=JSON.parse(this.responseText);
+                functoload(loadjsonObj);
+      }
+    };
+    axmlhttp.open("GET", URL, true);
+    axmlhttp.send(); 
+
+} 
+//idea learned from w3 schools to call loading once using multiple callbackfunctions
+//callback for topheadlines
+function inb1(amxlhttp){
+    amxlhttp.onload=topheadlinesparse(amxlhttp);
+}
+//callback for cnnheadlines    
+function inb2(amxlhttp1){
+    amxlhttp1.onload=cnnheadlinesparse(amxlhttp1);
+}
+//callback for fox
+function inb3(amxlhttp2){
+    amxlhttp2.onload=foxheadlinesparse(amxlhttp2);
+}     
+function topheadlinesjson(){
+    URL="/topheadlines"
+    loadingJSON(URL, inb1);
+}
+function topheadlinesparse(jsonObj){
+    clearInterval(intervaltime);
+    var articlelimitcounter=0;
+    var html_overlay = 0;
+    var nullcatcher=0;
+    entries=JSON.stringify(jsonObj);
+    articleslist=jsonObj.articles;
+    numberofarticles=jsonObj.articles.length;
+   for (c=0; c<numberofarticles; c++)
+   {
+       NodeList=articleslist[c];
+       var article_keys=Object.keys(NodeList); 
+       for (d=0; d<article_keys.length;d++)
+           {
+               prop=article_keys[d];
+                //catches if any of the contents is null
+               if(article_keys[d]=="author" || article_keys[d]=="description"|| article_keys[d]=="title"  || article_keys[d]=="url"  || article_keys[d]=="urlToImage" || article_keys[d]=="publishedAt"||article_keys[d]=="source")
+               {
+                   if(NodeList[prop]==null ||NodeList[prop]==""||NodeList[prop]=="null")
+                       {
+                        nullcatcher = 1;
+                        break;   
+                       }
+               
+               else
+               {
+                   nullcatcher=0;
+                  if(article_keys[d]=="description" && articlelimitcounter < 5)
+                   {
+                       slidertext=NodeList[prop];
+                   }
+                             
+                    if(article_keys[d]=="title" && articlelimitcounter < 5)
+                   {
+                       slidertitle=NodeList[prop];
+                   }
+               
+                    if(article_keys[d]=="url" && articlelimitcounter < 5)
+                   {
+                       sliderurl=NodeList[prop];
+                   }
+                             
+                    if(article_keys[d]=="urlToImage" && articlelimitcounter < 5)
+                   {
+                       sliderimg=NodeList[prop];
+                   }
+                   if(article_keys[d]=="source" && articlelimitcounter < 5)
+                   {
+                       if (NodeList[prop].name==null || NodeList[prop].name==""||NodeList[prop].name=="null"||NodeList[prop].id==null || NodeList[prop].id==""||NodeList[prop].id=="null")
+                            { 
+                                nullcatcher = 1;
+                                break;   
+                            }
+                   }
+                   
+               }          
+            }
+           }
+      if(nullcatcher==0 &&  articlelimitcounter < 5){     
+        html_overlay="<div class='cardhref'> <div class='headlines'><a href='";
+       html_overlay+=sliderurl;
+       html_overlay+="' target='_blank'><div class='linkoverlay'><h4 class='overlaytitles'>";
+       html_overlay+=slidertitle;
+       html_overlay+="</h4><p class='overlaydetails'>"
+       html_overlay+=slidertext;
+       html_overlay+="</p></div><img class = 'crop' src='";
+       html_overlay+=sliderimg;
+       html_overlay+="'></a></div></div>";
+          
+       prv_html_text+=html_overlay; 
+        storeforpic[articlelimitcounter]=html_overlay;
+       articlelimitcounter++;
+       }
+       else{
+           
+       }
+   }
+    
+
+    document.getElementById("insertslidingcards").innerHTML=storeforpic[0];
+   
+    
+    intervaltime = setInterval(function(){
+       
+       console.log(plsstop);
+          if(plsstop==1){ document.getElementById("insertslidingcards").innerHTML=storeforpic[tempi];
+        tempi++;
+               
+        if (tempi==5)
+            {
+                tempi=0;
+            }
+  
+                        }
+        else if (plsstop ==0)
+            {
+                clearInterval(intervaltime);
+                tempi = 1;
+            }
+}, 4000);
+        
+    prv_html_text="";
+
+}    
+function cnnheadlinesjson(){
+    URL="/cnnheadlines";
+    loadingJSON(URL, inb2);
+}
+function foxheadlinesjson(){
+    URL="/foxheadlines";
+    loadingJSON(URL, inb3);
+}
+function cnnheadlinesparse(jsonObj){
+    var cnnarticlelimitcounter=0;
+    var cnnhtml_overlay = 0;
+    var cnnnullcatcher=0;
+    entries=JSON.stringify(jsonObj);
+    articleslist=jsonObj.articles;
+    numberofarticles=jsonObj.articles.length;
+   for (c=0; c<numberofarticles; c++)
+   {
+       NodeList=articleslist[c];
+       var cnnarticle_keys=Object.keys(NodeList); 
+       for (d=0; d<cnnarticle_keys.length;d++)
+           {
+               prop=cnnarticle_keys[d];
+               if(cnnarticle_keys[d]=="author"||cnnarticle_keys[d]=="description"  || cnnarticle_keys[d]=="title"  || cnnarticle_keys[d]=="url"  || cnnarticle_keys[d]=="urlToImage"|| cnnarticle_keys[d]=="publishedAt"|| cnnarticle_keys[d]=="source"){
+                   if(NodeList[prop]==null ||NodeList[prop]==""||NodeList[prop]=="null")
+                       {
+                        cnnnullcatcher = 1;
+                        break;   
+                       }
+               
+               else
+               {
+                   cnnnullcatcher=0;
+                  if(cnnarticle_keys[d]=="description" && cnnarticlelimitcounter < 4)
+                   {
+                       slidertext=NodeList[prop];
+                   }
+                             
+                    if(cnnarticle_keys[d]=="title" && cnnarticlelimitcounter < 4)
+                   {
+                       slidertitle=NodeList[prop];
+                   }
+               
+                    if(cnnarticle_keys[d]=="url" && cnnarticlelimitcounter < 4)
+                   {
+                       sliderurl=NodeList[prop];
+                   }
+                             
+                    if(cnnarticle_keys[d]=="urlToImage" && cnnarticlelimitcounter < 4)
+                   {
+                       sliderimg=NodeList[prop];
+                   }
+                   if(cnnarticle_keys[d]=="source" && cnnarticlelimitcounter < 5)
+                   {
+                       if (NodeList[prop].name==null || NodeList[prop].name==""||NodeList[prop].name=="null"||NodeList[prop].id==null || NodeList[prop].id==""||NodeList[prop].id=="null")
+                            { 
+                                cnnnullcatcher = 1;
+                                break;   
+                            }
+                   }
+               } 
+        }           
+
+           }
+      if(cnnnullcatcher==0 &&  cnnarticlelimitcounter < 4){     
+        cnnhtml_overlay="<td><div class='cardhref'><a href='";
+       cnnhtml_overlay+=sliderurl;
+       cnnhtml_overlay+="' target='_blank'> <div class='card1'><img class='cardimages' src='";
+       cnnhtml_overlay+=sliderimg;
+        cnnhtml_overlay+="'><div class='cardtext'><h4>";
+       cnnhtml_overlay+=slidertitle;
+       cnnhtml_overlay+="</h4><p>";
+         cnnhtml_overlay+=slidertext;
+        cnnhtml_overlay+="</p></div></div></a></div></td>";
+       nxt_html_text+=cnnhtml_overlay;
+       cnnarticlelimitcounter++;
+       }
+       else{
+           
+       }
+   }
+    document.getElementById("insertcnncard").outerHTML=nxt_html_text; 
+    nxt_html_text="";
+}
+function foxheadlinesparse(jsonObj){
+    var fcnnarticlelimitcounter=0;
+    var fcnnhtml_overlay = 0;
+    var fcnnnullcatcher=0;
+    entries=JSON.stringify(jsonObj);
+    articleslist=jsonObj.articles;
+    numberofarticles=jsonObj.articles.length;
+   for (c=0; c<numberofarticles; c++)
+   {
+       NodeList=articleslist[c];
+       var fcnnarticle_keys=Object.keys(NodeList); 
+       for (d=0; d<fcnnarticle_keys.length;d++)
+           {
+               prop=fcnnarticle_keys[d];
+                //catches if any of the contents is null
+               if(fcnnarticle_keys[d]=="author"  ||fcnnarticle_keys[d]=="description"  || fcnnarticle_keys[d]=="title"  || fcnnarticle_keys[d]=="url"  || fcnnarticle_keys[d]=="urlToImage"|| fcnnarticle_keys[d]=="publishedAt"|| fcnnarticle_keys[d]=="source"){
+                    if(NodeList[prop]==null ||NodeList[prop]==""||NodeList[prop]=="null")
+                       {
+                        fcnnnullcatcher = 1;
+                        break;   
+                       }
+
+               else
+               {
+                   fcnnnullcatcher=0;
+                  if(fcnnarticle_keys[d]=="description" && fcnnarticlelimitcounter < 4)
+                   {
+                       slidertext=NodeList[prop];
+                   }
+                             
+                    if(fcnnarticle_keys[d]=="title" && fcnnarticlelimitcounter < 4)
+                   {
+                       slidertitle=NodeList[prop];
+                   }
+               
+                    if(fcnnarticle_keys[d]=="url" && fcnnarticlelimitcounter < 4)
+                   {
+                       sliderurl=NodeList[prop];
+                   }
+                             
+                    if(fcnnarticle_keys[d]=="urlToImage" && fcnnarticlelimitcounter < 4)
+                   {
+                       sliderimg=NodeList[prop];
+                   }
+                 if(fcnnarticle_keys[d]=="source" && fcnnarticlelimitcounter < 5)
+                   {
+                       if (NodeList[prop].name==null || NodeList[prop].name==""||NodeList[prop].name=="null"||NodeList[prop].id==null || NodeList[prop].id==""||NodeList[prop].id=="null")
+                            { 
+                                fcnnnullcatcher = 1;
+                                break;   
+                            }
+                   }
+               }          
+
+           }
+        }
+      if(fcnnnullcatcher==0 &&  fcnnarticlelimitcounter < 4){     
+        fcnnhtml_overlay="<td><div class='cardhref'><a href='";
+       fcnnhtml_overlay+=sliderurl;
+       fcnnhtml_overlay+="' target='_blank'> <div class='card1'><img class='cardimages' src='";
+       fcnnhtml_overlay+=sliderimg;
+        fcnnhtml_overlay+="'><div class='cardtext'><h4>";
+       fcnnhtml_overlay+=slidertitle;
+       fcnnhtml_overlay+="</h4><p>";
+         fcnnhtml_overlay+=slidertext;
+        fcnnhtml_overlay+="</p></div></div></a></div></td>";
+       nxt2_html_text+=fcnnhtml_overlay;
+       fcnnarticlelimitcounter++;
+       }
+       else{
+           
+       }
+   }
+    document.getElementById("insertfoxcard").outerHTML=nxt2_html_text; 
+    nxt2_html_text="";
+}
+</script>  
+  <!--These scripts specifically for word cloud-->  
+<script>      
+var frequencyarray;
+      
+function wcloadingJSON(URL, wcfunctoload){
+    var wcaxmlhttp;
+    wcaxmlhttp=new XMLHttpRequest();
+    //URL="/cnnheadlines";
+    wcaxmlhttp.onreadystatechange = function()
+    {
+     if (this.readyState== 4 && this.status==200)
+            {
+              var wcloadjsonObj=JSON.parse(this.responseText);
+                wcfunctoload(wcloadjsonObj);
+      }
+    };
+    wcaxmlhttp.open("GET", URL, true);
+    wcaxmlhttp.send(); 
+
+} 
+
+        
+function wctopheadlinesjson(){
+    URL="/wordcloud";
+    wcloadingJSON(URL, inb4);
+}
+        
+function inb4(somehttp){
+    somehttp.onload=wctopheadlinesparse(somehttp);
+}
+        
+function wctopheadlinesparse(wcjsonObj){
+    frequencyarray = wcjsonObj; 
+var wcwordarray=[];     
+function wcpushingstuff(){
+    for (wci = 0; wci< 30; wci++)
+        {
+            var wcnewstring=frequencyarray[wci][1]*5;
+         var wcstrin=wcnewstring.toString();
+                var wcobj={};
+    wcobj["word"]=frequencyarray[wci][0];
+    wcobj["size"]=wcstrin;
+    wcwordarray.push(wcobj);
+        }
+}
+// This pushes the words to the function
+wcpushingstuff();
+var myWords = wcwordarray;
+
+// set the dimensions and margins of the graph
+var margin = {top: 5, right: 5, bottom: 5, left: 5},
+    width = 300 - margin.left - margin.right,
+    height = 250 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top+")");
+
+// Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
+// Wordcloud features that are different from one word to the other must be here
+var layout = d3.layout.cloud()
+  .size([width, height])
+  .words(myWords.map(function(d) { return {text: d.word, size:d.size}; }))
+  .padding(5)        //space between words
+  .rotate(function() { return ~~(Math.random() * 2) * 90; })
+  .fontSize(function(d) { return d.size; })      // font size of words
+  .on("end", draw);
+layout.start();
+
+// This function takes the output of 'layout' above and draw the words
+// Wordcloud features that are THE SAME from one word to the other can be here
+    
+function draw(words) {
+  svg
+    .append("g")
+      .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size +"px"; })
+        .style("fill", "black")
+        .attr("text-anchor", "middle")
+        .style("font-family", "Impact")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+}
+    
+}     
+</script>
+<script>
+var ibeenchosen;
+var numberofarticles;
+function sendrequesttoserver(){
+        event.preventDefault();
+    buttonactiveornot = 1;
+    defaulthidecards();
+    showbutton();
+        var defURL="/getthedocs0";
+        var testform = document.getElementById("textingid");
+        var testdatefrom = document.getElementById("datefromid");
+        var testdateto = document.getElementById("datetoid");
+    var selectcategory = document.getElementById("category");
+        var selectsource = document.getElementById("source");
+        if (testdatefrom.value > testdateto.value)
+            {
+                alert("Incorrect Time.");
+            }
+        else{
+            if (selectsource.value!="all"){
+            var fixsource=selectsource.value;
+            fixsource=fixsource.replace(/\s/g, "^");
+            var fixformvalues=testform.value;
+           fixformvalues=fixformvalues.replace(/\s/g, "_");
+                defURL="/getthedocs"+fixformvalues+" "+testdatefrom.value+" "+testdateto.value+" "+fixsource;
+                sendrequestloadJSON(defURL, sinb2);
+            }
+            else if (selectsource.value=="all")
+                {
+            var afixformvalues=testform.value;
+           afixformvalues=afixformvalues.replace(/\s/g, "_");
+            defURL="/getthedocs0 "+afixformvalues+" "+testdatefrom.value+" "+testdateto.value;
+                sendrequestloadJSON(defURL, sinb2);
+                }
+        }
+    }
+function sendrequestloadJSON(SRURL, requesttoload){
+    var abcxmlhttp;
+    abcxmlhttp=new XMLHttpRequest();
+    abcxmlhttp.onreadystatechange = function()
+    {
+     if (this.readyState== 4 && this.status==200)
+    {   
+              var requestloadjsonObj=this.responseText;       
+                requesttoload(requestloadjsonObj);
+      }
+
+    };
+    abcxmlhttp.open("GET", SRURL, true);
+    abcxmlhttp.send(); 
+}
+function sinb2(abcmxlhttp){
+    abcmxlhttp.onload=requestloadparse(abcmxlhttp);
+}
+function requestloadparse(rjsonObj){
+    console.log(rjsonObj);
+    var gethtml_overlay = "";
+    document.getElementById("noresults").style.display="none";
+    try{
+    rjsonObj=JSON.parse(rjsonObj);
+    }
+    catch(error){
+        alert(rjsonObj);
+        return;
+    }
+    if(rjsonObj.totalResults==0){
+        console.log("here");
+        document.getElementById("noresults").style.display="block";
+       showingml = 0; 
+    document.getElementById("butmoreless").style.display="none";
+    }
+    var getarticlelimitcounter=0;
+    
+    var getnullcatcher=0;
+    entries=JSON.stringify(rjsonObj);
+    getarticleslist=rjsonObj.articles;
+    getnumberofarticles=rjsonObj.articles.length;
+   for (getc=0; getc<getnumberofarticles; getc++)
+   {
+       getNodeList=getarticleslist[getc];
+       var getarticle_keys=Object.keys(getNodeList);
+       for (getd=0; getd<getarticle_keys.length;getd++)
+           {
+               getprop=getarticle_keys[getd];
+               if(getarticle_keys[getd]=="author"  || getarticle_keys[getd]=="description"  || getarticle_keys[getd]=="title"  || getarticle_keys[getd]=="url"  || getarticle_keys[getd]=="urlToImage"|| getarticle_keys[getd]=="publishedAt"|| getarticle_keys[getd]=="source"){
+                   if(getNodeList[getprop]==null || getNodeList[getprop]=="" || getNodeList[getprop]=="null" ){
+                    if(getarticle_keys[getd]!="source")
+                        {
+                            getnullcatcher = 1;
+                            break;
+                        }
+                   }
+
+               else
+               {
+                   getnullcatcher=0;
+                  if(getarticle_keys[getd]=="description" && getarticlelimitcounter < 15)
+                   {
+                       getslidertext=getNodeList[getprop];
+                   }
+                             
+                    if(getarticle_keys[getd]=="title" && getarticlelimitcounter < 15)
+                   {
+                       getslidertitle=getNodeList[getprop];
+                       console.log(getslidertitle);
+                   }
+               
+                    if(getarticle_keys[getd]=="url" && getarticlelimitcounter < 15)
+                   {
+                       getsliderurl=getNodeList[getprop];
+                   }
+                             
+                    if(getarticle_keys[getd]=="urlToImage" && getarticlelimitcounter < 15)
+                   {
+                       getsliderimg=getNodeList[getprop];
+                   }
+                    if(getarticle_keys[getd]=="author" && getarticlelimitcounter < 15)
+                   {
+                       getauthor=getNodeList[getprop];
+                   }
+                    if(getarticle_keys[getd]=="publishedAt" && getarticlelimitcounter < 15)
+                   {
+                       getpublishedat=getNodeList[getprop];
+                   }
+                    if(getarticle_keys[getd]=="source" && getarticlelimitcounter < 15)
+                   {
+                       if (getNodeList[getprop].name==null || getNodeList[getprop].name==""||getNodeList[getprop].name=="null")
+                            {   console.log("rare");
+                                getnullcatcher = 1;
+                                break;   
+                            }
+                       else
+                       {
+                 getpublicname=getNodeList[getprop].name;  
+                       }
+                   }
+               }          
+               }
+           }
+      if(getnullcatcher==0 &&  getarticlelimitcounter < 15){
+        getpublishedat=getpublishedat.substring(0,10);
+        var reconfigdate = getpublishedat.split('-');
+        var todayex = new Date();
+        var fixingdate = todayex.getDate();
+        fixingdate++;
+        if (fixingdate = reconfigdate[2])
+            {
+                reconfigdate[2]=reconfigdate[2]-1;
+            }
+          reconfigdate[0]=reconfigdate[1]+"/"+reconfigdate[2]+"/"+reconfigdate[0];
+          var consgetslidertext=makeconcise(getslidertext);
+        consgetslidertext=consgetslidertext.replace(/'/g, "&apos;");
+        getslidertext=getslidertext.replace(/'/g, "&apos;");
+        getslidertitle=getslidertitle.replace(/'/g, "&apos;");
+        getauthor=getauthor.replace(/'/g, "&apos;");
+        getpublicname=getpublicname.replace(/'/g, "&apos;");
+        consgetslidertext=consgetslidertext.replace(/"/g, "");
+        getslidertext=getslidertext.replace(/"/g, "");
+        getslidertitle=getslidertitle.replace(/"/g, "");
+        getauthor=getauthor.replace(/"/g, "");
+        getpublicname=getpublicname.replace(/"/g, "");
+             gethtml_overlay+="<div class='returncard'  onclick='expands(";
+          gethtml_overlay+=getarticlelimitcounter+",\""+getauthor+"\",\""+getpublicname+"\",\""+reconfigdate[0]+"\",\""+getslidertext+"\",\""+getsliderurl+"\",\""+getsliderimg+"\",\""+getslidertitle+"\",\""+consgetslidertext+"\")'><p class='marksthespot' onclick='closes(";
+            gethtml_overlay+=getarticlelimitcounter+",\""+getsliderimg+"\",\""+consgetslidertext+"\",\""+getslidertitle+"\",\""+getauthor+"\",\""+getpublicname+"\",\""+reconfigdate[0]+"\",\""+getsliderurl+"\",\""+getslidertext+"\")'>&times;</p><div class='imagecolumn tofloat'><img src='";
+          gethtml_overlay+=getsliderimg+"' class='cropcardpic tofloat'></div><div class='compcardalltext'><h4>";
+          gethtml_overlay+=getslidertitle+"</h4><p class='compcardtext'>";
+          gethtml_overlay+=consgetslidertext+"</p></div></div>";
+       getarticlelimitcounter++;
+       }
+       else{
+           
+       }
+   }
+    gethtml_overlay+="<button id='butmoreless' onclick='showbutton()'>Show More</button>";
+   document.getElementById("replace").innerHTML=gethtml_overlay;
+    showbydefault();
+    
+}
+function selectforsource(haveibeenreset){
+             if(haveibeenreset == 1){
+                 defaultstuff();
+document.getElementById("butmoreless").style.display="none";
+                 sourcejson("all");
+                 
+             }
+            else{
+            ibeenchosen=document.getElementById('category');
+            sourcejson(ibeenchosen.value);
+              
+            }
+        }
+function defaulthidecards(){
+    var hidthecards = document.getElementsByClassName("returncard");
+                 for(hidthec = 0; hidthec < hidthecards.length; hidthec++)
+                     {
+                 hidthecards[hidthec].style.display="none";
+                     }
+}
+function defaultstuff(){
+        selectforsource(0);
+        showbydefault();
+        defaulthidecards();
+    document.getElementById("noresults").style.display="none";
+        var today = new Date();
+        var day = today.getDate();
+        var month = today.getMonth();
+        var year = today.getFullYear();
+        month=month+1;
+        if (day<10)
+            {
+            day="0"+day;
+            }
+        if (month < 10)
+            {
+                month = "0"+ month;
+            }
+        //console.log(month);
+        document.getElementById("textingid").value="";
+        document.getElementById("category").value="all";
+        document.getElementById("datetoid").value=year+"-"+month+"-"+day;
+        document.getElementById("datetoid").max=year+"-"+month+"-"+day;
+         document.getElementById("datefromid").max=year+"-"+month+"-"+day;
+        today.setDate(today.getDate()-7);
+        var oldday = today.getDate();
+        var oldmonth = today.getMonth();
+        var oldyear = today.getFullYear();
+        oldmonth=oldmonth+1;
+        if (oldday<10)
+            {
+            oldday="0"+oldday;
+            }
+        if (oldmonth < 10)
+            {
+                oldmonth = "0"+ oldmonth;
+            }
+
+document.getElementById("datefromid").value=oldyear+"-"+oldmonth+"-"+oldday;
+        
+    }
+    
+function sourcesloadJSON(SURL, sourcetoload){
+    var abxmlhttp;
+    abxmlhttp=new XMLHttpRequest();
+    //URL="/cnnheadlines";
+    abxmlhttp.onreadystatechange = function()
+    {
+     if (this.readyState== 4 && this.status==200)
+            {
+              var sourceloadjsonObj=JSON.parse(this.responseText);
+              // var sourceloadjsonObj=this.responseText; 
+                sourcetoload(sourceloadjsonObj);
+      }
+    };
+    abxmlhttp.open("GET", SURL, true);
+    abxmlhttp.send(); 
+
+}
+function sinb1(abmxlhttp){
+    abmxlhttp.onload=sourceloadparse(abmxlhttp);
+}
+function sourcejson(addtourl){
+    SURL="/getthesources"+addtourl;
+    sourcesloadJSON(SURL, sinb1);
+   // jsonObj=loadingJSON(URL);
+//jsonObj.onload=cnnheadlinesparse(jsonObj);
+}
+function sourceloadparse(jsonObj){
+    var sourcearticlelimitcounter=0;
+    var sourceshtml_overlay = "<option value='all'  selected>all</option>";
+    var sourcenullcatcher=0;
+    entries=JSON.stringify(jsonObj);
+    sourceslist=jsonObj.sources;
+    numberofsources=jsonObj.sources.length;
+   for (sc=0; sc<numberofsources; sc++)
+   {
+       NodeList=sourceslist[sc];
+       var source_keys=Object.keys(NodeList); 
+       for (sd=0; sd<source_keys.length;sd++)
+           {
+               prop=source_keys[sd];
+                //catches if any of the contents is null
+               if((source_keys[sd]=="name")  && (NodeList[prop]==null ||NodeList[prop]=="" )){
+                   sourcenullcatcher = 1;
+                   break;
+               }
+               else
+               {
+                   sourcenullcatcher=0;
+                   if(source_keys[sd]=="name")
+                   {
+                       sourcetext=NodeList[prop];
+                   }
+                             
+                    
+               }          
+
+           }
+      if(sourcenullcatcher==0){     
+        sourceshtml_overlay+="<option value='"+sourcetext+"' >"+sourcetext+"</option>";
+        
+       sourcearticlelimitcounter++;
+       }
+       else{
+           
+       }
+   }
+    document.getElementById("source").innerHTML=sourceshtml_overlay; 
+    
+}
+    </script>
+    <script>
+function makeconcise(tomakeconcise){ 
+    var concisearray = tomakeconcise.split(" ");
+    for (disci = 0; disci< concisearray.length; disci++){
+        //this defines the max length the description can take up before going to the next line.
+        if(tomakeconcise.length > 76)
+            {
+        concisearray.pop();
+        tomakeconcise = concisearray.join(" ");
+        concisearray = tomakeconcise.split(" ");
+         disci=0;       
+            }
+        else if (tomakeconcise != ""){
+        tomakeconcise = concisearray.join(" ");
+        tomakeconcise = tomakeconcise + "...";
+        // console.log(descdisplay);  
+            return tomakeconcise;
+        }   
+        //console.log(testarray.length);
+    }
+}
+var justclosed=0;
+function expands(whichclick, exau, exsou, exda, extxt, exurl, exim, exhead, condensoup){
+    var exresethtmlinner="";
+       if (justclosed == 0){
+exau=exau.replace(/'/g, "&apos;");
+exsou=exsou.replace(/'/g, "&apos;");
+extxt=extxt.replace(/'/g, "&apos;");
+exhead=exhead.replace(/'/g, "&apos;");
+condensoup=condensoup.replace(/'/g, "&apos;"); 
+exau=exau.replace(/"/g, "");
+exsou=exsou.replace(/"/g, "");
+extxt=extxt.replace(/"/g, "");
+exhead=exhead.replace(/"/g, "");  
+condensoup=condensoup.replace(/"/g, "");
+exresethtmlinner+="<div class='returncard'  onclick='expands(";
+exresethtmlinner+=whichclick+",\""+exau+"\",\""+exsou+"\",\""+exda+"\",\""+extxt+"\",\""+exurl+"\",\""+exim+"\",\""+exhead+"\",\""+condensoup+"\")'><p class='marksthespot' onclick='closes(";
+exresethtmlinner+=whichclick+",\""+exim+"\",\""+condensoup+"\",\""+exhead+"\",\""+exau+"\",\""+exsou+"\",\""+exda+"\",\""+exurl+"\",\""+extxt+"\")\'>&times;</p><div class='imagecolumn tofloat'><img src='";
+exresethtmlinner+=exim+"' class='cropcardpic tofloat'></div><div class='compcardalltext'><h4>";
+exresethtmlinner+=exhead+"</h4><p class='compcardtext'><B>Author: </B>"+exau+"</p><p class='compcardtext'><B>Source: </B>"+exsou+"</p><p class='compcardtext'><B>Date: </B>"+exda+"</p><p class='compcardtext'>"+extxt+"</p><a class='compcardtext' href='"+exurl+"'target='_blank'>See Original Post</a></div></div>";
+console.log(exresethtmlinner);
+var storeexpclass3 = document.getElementsByClassName("returncard");
+   var storeexpclass = document.getElementsByClassName("returncard");
+   var storeexpclass1 = document.getElementsByClassName("imagecolumn");
+
+   var storeexpclass2= document.getElementsByClassName("marksthespot"); 
+        storeexpclass3[whichclick].outerHTML=exresethtmlinner;
+         storeexpclass[whichclick].style.display= "block";
+           storeexpclass[whichclick].style.height= "250px";
+        storeexpclass1[whichclick].style.height= "250px";
+        storeexpclass[whichclick].style.cursor="default";
+ storeexpclass2[whichclick].style.display="block";
+     }
+       else{
+           justclosed =0;
+       }
+       // console.log(storeexpclass);
+//document.getElementById("replace").innerHTML="<p>here</p>";
+     //document.getElementsByClassName("imagecolumn").style.height="500px";
+       //openorclosestatus=1;
+}
+
+function closes(whichclose, slim, conslit, slitt, cloau, closo, clodat, clourl, clotext){
+  var resethtmlinner="";
+conslit=conslit.replace(/'/g, "&apos;");
+slitt=slitt.replace(/'/g, "&apos;");
+cloau=cloau.replace(/'/g, "&apos;");
+closo=closo.replace(/'/g, "&apos;");
+clotext=clotext.replace(/'/g, "&apos;");
+conslit=conslit.replace(/"/g, "");
+slitt=slitt.replace(/"/g, "");
+cloau=cloau.replace(/"/g, "");
+closo=closo.replace(/"/g, "");
+clotext=clotext.replace(/"/g, "");
+resethtmlinner+="<div class='returncard'  onclick='expands(";
+resethtmlinner+=whichclose+",\""+cloau+"\",\""+closo+"\",\""+clodat+"\",\""+clotext+"\",\""+clourl+"\",\""+slim+"\",\""+slitt+"\",\""+conslit+"\")'><p class='marksthespot' onclick='closes(";
+resethtmlinner+=whichclose+",\""+slim+"\",\""+conslit+"\",\""+slitt+"\")\'>&times;</p><div class='imagecolumn tofloat'><img src='";
+resethtmlinner+=slim+"' class='cropcardpic tofloat'></div><div class='compcardalltext'><h4>";
+resethtmlinner+=slitt+"</h4><p class='compcardtext'>";
+resethtmlinner+=conslit+"</p></div></div>";    
+console.log(whichclose);    
+console.log(resethtmlinner);
+var storecloseclass3 = document.getElementsByClassName("returncard");
+storecloseclass3[whichclose].outerHTML=resethtmlinner;        
+//set everything back to default styling     
+var storecloseclass = document.getElementsByClassName("returncard");
+var storecloseclass1 = document.getElementsByClassName("imagecolumn");
+var storecloseclass2= document.getElementsByClassName("marksthespot"); 
+ storecloseclass[whichclose].style.cursor="pointer";
+ storecloseclass[whichclose].style.display="block";
+ storecloseclass[whichclose].style.height="120px";
+ storecloseclass1[whichclose].style.height="120px";
+ storecloseclass2[whichclose].style.display="none";
+justclosed=1;
+    }
+//this var defines what state the show more or less button is
+var showingml=0;
+//this var is used to define how many are shown.  Default is 5.
+var howmanyshowndefault= 5;
+function showbydefault(){
+    var showmlclass = document.getElementsByClassName("returncard");
+    console.log(showmlclass.length);
+    for (showml=0; showml < showmlclass.length; showml++)
+        {
+            if(showml < howmanyshowndefault)
+                {
+                    if(showml<4){
+                        showingml = 0;
+        
+                    }
+                    else{
+                        showingml = 1;
+                    }
+          showmlclass[showml].style.display="block";
+                //    console.log(showingml);
+                    }
+        }
+    showbuttondefault();
+}
+function showbuttondefault(){
+    if (showingml ==1)
+        {
+            document.getElementById("butmoreless").style.display="block";
+          //  console.log("here");
+            
+        }
+    else if (showingml ==0)
+        {
+            document.getElementById("butmoreless").style.display="none";
+            
+        }
+}
+//this var defines the state of the button as pressed or not.
+var buttonactiveornot = 0;
+function showbutton(){
+    if (buttonactiveornot ==0){
+    buttonactiveornot=1;
+    document.getElementById("butmoreless").textContent="Show Less";
+    var cardamountsforbuttons = document.getElementsByClassName("returncard");
+    howmanyshowndefault=cardamountsforbuttons.length;
+    showbydefault();
+    }
+    else
+        {
+           // console.log("here");
+            howmanyshowndefault = 5;
+            document.getElementById("butmoreless").textContent="Show More";
+            var cardamountstohide = document.getElementsByClassName("returncard");
+            for (hidei = 0; hidei < cardamountstohide.length; hidei++)
+                {
+                    cardamountstohide[hidei].style.display="none";
+                }
+            buttonactiveornot=0;
+            showbydefault();
+        }
+}
+
+</script>
+</head>
+      
+<body id="centerall" onload="button1()">
+<!--<body id="centerall">-->
+    
+<div class="buttonformat">
+    <div>
+        <input type="button" class= "some" id="button1" value="Google News" onclick="button1()" >        
+    </div>  
+    <div>
+        <input type="button" id= "button2" value="Search"
+               onclick="button2()">
+    
+    </div> 
+</div>  
+<div class="middle" id="maincontent"> 
+    
+    <table id="tophalf">
+    <tr>
+        <td id="insertslidingcards">
+            <p>test</p>
+        </td>
+        <td colspan="2" id = 'my_dataviz'>
+           <!-- <p>test</p>-->
+          <!-- <div id='my_dataviz'></div>     --> 
+        </td>
+    </tr>
+    </table>
+
+        <table id="bottomhalf">
+        <th class = "titles" colspan="4">CNN<hr></th>
+    <tr id="cnncards">
+        <td id="insertcnncard">
+        </td>
+    </tr>
+    <!--delete when working with fox!-->
+    
+        
+        <th class = "titles" colspan="4">Fox News<hr></th>
+        
+<tr id="cnncards">
+        <td id="insertfoxcard">
+            
+        </td>
+    </tr>
+
+
+    </table>
+
+</div>
+      
+  <!-- <div onload="autoslidechange()"></div>-->
+<!-- additional script for carousel function-->   
+<div id="hidethistillclicked" class="middle">
+    
+<form id="mainform" onsubmit="sendrequesttoserver()">
+ <!--   <div id="centerform"></div>-->
+    <label class="formformating0" for='texting'>Keyword<span class="requiredstar">*</span></label>
+    <input class= "formformating0" NAME='texting' TYPE="text" SIZE=20 id="textingid" autocomplete="on" required>
+    <label class= "formformating1" for='datefrom'>From<span class="requiredstar">*</span></label>
+    <input class= "formformating1" NAME='datefrom' TYPE="date" SIZE=20 id="datefromid" value="yyyy/mm/dd" min="2009-01-01" max="2021-12-31" required>
+    <label class= "formformating1" for='dateto'>To<span class="requiredstar">*</span></label>
+    <input class= "formformating1" NAME='dateto' TYPE="date" SIZE=40 id="datetoid" value="yyyy/mm/dd" min="2000-01-01" max="2021-12-31" required><br>
+    
+   <div id="centerform">
+    <label for='category'>Category</label>
+    <select id="category" onchange="selectforsource(0)">
+    <option value="all"  selected>all</option>
+    <option value="business">Business</option>
+    <option value="entertainment">Entertainment</option>
+    <option value="general">General</option>
+    <option value="health">Health</option>
+    <option value="science">Science</option>
+    <option value="sports">Sports</option>
+    <option value="technology">Technology</option>
+    </select>
+    
+    <label for='source'>Source</label>
+    <select id="source">
+    <option value="all" selected>all</option>
+        <div id="filler"></div>
+    </select>
+       <br>
+       </div>
+    
+    <div id="centersubmit">
+    <input class="bottombut" type="submit" value="Search">
+    <input class="bottombut" type="button" value="Clear" onclick="selectforsource(1)">
+    </div>
+    
+</form>
+
+   <div id="replace">
+       <div id="hideyourskeletons">
+        <!--You need to define which expands is clicked when generating the html in js! stick a var in-->
+<div class="returncard"  onclick="expands(0, 'Steve', 'Test', '03/03/03', 'testingts', '', '', 'heading')">
+            <!--You need to define which closes is clicked when generating the html in js! stick the same var in-->
+        <p class="marksthespot" onclick='closes(3,"","Mets+&apos; Conforto strains oblique...","Mets&apos; Conforto strains oblique muscle, opening day not clear")'>&times;</p>
+    <div class="imagecolumn tofloat">
+    <img src="" class="cropcardpic tofloat">
+        </div>
+    <div class="compcardalltext">
+<h4></h4>
+<p class="compcardtext"></p>
+    </div>
+</div>
+       
+
+   <button id="butmoreless" onclick="showbutton()">Show More</button>        
+    </div> 
+       </div> 
+    <p id="noresults">No Results</p>
+</div>           
+   
+    
+        
+    </body>
+</html>
